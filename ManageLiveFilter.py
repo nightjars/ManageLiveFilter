@@ -52,12 +52,7 @@ def edit_inversion(inv_id=None):
 
     form = InversionForm(request.values, **inversion)
     if request.method == 'POST' and form.validate():
-        print (str(form.data))
-        print ("passed")
-    else:
-        print ("failed")
-        print (request.method)
-        print ((str(form.data)))
+        return redirect('/')
 
     return render_template('edit_inversion.html', form=form)
 
@@ -65,17 +60,53 @@ def edit_inversion(inv_id=None):
 @app.route('/faults/<int:inv_id>', methods=['GET'])
 @app.route('/faults', methods=['POST'])
 def edit_faults(inv_id=None):
-    inversion = client_api.get_inversion_api(inv_id)
-    if inversion:
-        faults = inversion['faults']
-        fault_data = str(faults['length']) + " " + \
-                     str(faults['width']) + "\n"
-        for fault in faults['subfault_list']:
-            for float_entry in fault:
-                fault_data += str(float_entry)
-            fault_data += "\n"
-    form = FaultForm(request.values, fault_data=fault_data)
+    if inv_id is not None:
+        inversion = client_api.get_inversion_api(inv_id)
+        if inversion:
+            faults = inversion['faults']
+            fault_data = str(faults['length']) + " " + \
+                         str(faults['width']) + "\n"
+            for fault in faults['subfault_list']:
+                for float_entry in fault:
+                    fault_data += str(float_entry) + " "
+                fault_data += "\n"
+            fault_data = fault_data[:-1]    # remove last newline
+        form = FaultForm(request.values, fault_data=fault_data, id=inv_id)
+    else:
+        form = FaultForm(request.values)
+
+    if request.method == 'POST' and form.validate():
+        line_num = 1
+        fault_data = form.fault_data.data.split('\n')
+        try:
+            fault_data[0] = fault_data[0].split()
+            print (fault_data[0])
+            faults = {
+                'length': float(fault_data[0][0]),
+                'width': float(fault_data[0][1]),
+                'subfault_list': []
+            }
+            print(faults)
+            for fault in fault_data[1:]:
+                line_num += 1
+                fault_entries = fault.split()
+                if len(fault_entries) < 7:
+                    raise Exception
+                elif len(fault_entries) > 8:
+                    raise Exception
+                elif len(fault_entries) == 7:
+                    fault_entries.append(0.)
+                fault_entries = [float(x) for x in fault_entries]
+                faults['subfault_list'].append(fault_entries)
+                print (fault_entries)
+            return redirect('/')
+        except:
+            # error on line line # - add error message
+            print ("error line {}".format(line_num))
+            pass
+
     return render_template('edit_faults.html', form=form)
+
 
 @app.route('/enable/<int:inv_id>')
 def enable_inversion(inv_id):
