@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Status</title>
+</head>
+<body>
+<div>
+    <p>
+    <ul><li>Current Timestamp:
+    {{ status['current_timestamp'] }}</li>
+    <li>Newest Timestamp:
+    {{ status['newest_timestamp'] }}</li></ul>
+    </p>
+</div>
+<table border="1">
+{% for entry in status['inversions'] %}
+    <tr>
+        <td>{{ entry['model'] }}</td>
+        <td>
+            {% if entry['active'] %}
+                <a href="{{'disable/' + entry['id']|string }}">
+                Disable
+                </a>
+            {% else %}
+                <a href="{{'enable/' + entry['id']|string }}">
+                Enable
+                </a>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{'edit/' + entry['id']|string }}">
+                Edit
+            </a>
+        </td>
+        <td>
+            <a href="{{'faults/' + entry['id']|string }}">
+                Edit Faults
+            </a>
+        </td>
+        <td>
+            <a href="{{'delete/' + entry['id']|string }}">
+                Delete
+            </a>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+<a href="edit">Create New Inversion</a>
+</body>
+</html>

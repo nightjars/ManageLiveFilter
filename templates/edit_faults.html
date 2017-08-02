@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Faults</title>
+</head>
+<body>
+<form method="post" action="/edit">
+    <p>Enter data in this format:<br/>
+        First Line: (fault width) (fault length)<br/>
+Each subsequent line, floats values for each subfault, with data in this order:<br/>
+<ol>
+    <li>Latitude</li>
+    <li>Longitude</li>
+    <li>Depth</li>
+    <li>Strike</li>
+    <li>Dip</li>
+    <li>Length</li>
+    <li>Width</li>
+    <li>(Some other field, unsure what this does, if anything)</li>
+</ol>
+<table>
+    {% for field in form %}
+        {% if field.type != "HiddenField" %}
+            <tr>
+            <td>{{ field.label }}</td>
+            <td>{{ field(cols="100",rows="40") }}</td>
+            </tr>
+        {% else %}
+            {{ field }}
+        {% endif %}
+    {% endfor %}
+</table>
+    <input type=submit value="Save">
+    <a href="/">Cancel</a>
+</form>
+</body>
+</html>
