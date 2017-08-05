@@ -86,7 +86,6 @@ def edit_faults(inv_id=None):
                 'width': float(fault_data[0][1]),
                 'subfault_list': []
             }
-            print(faults)
             for fault in fault_data[1:]:
                 line_num += 1
                 fault_entries = fault.split()
@@ -98,11 +97,12 @@ def edit_faults(inv_id=None):
                     fault_entries.append(0.)
                 fault_entries = [float(x) for x in fault_entries]
                 faults['subfault_list'].append(fault_entries)
-                print (fault_entries)
+            client_api.replace_faults(int(form.id.data), faults)
             return redirect('/')
         except:
             # error on line line # - add error message
             print ("error line {}".format(line_num))
+            print (fault_data[line_num + 1])
             pass
 
     return render_template('edit_faults.html', form=form)
